@@ -13,7 +13,7 @@ class MassSpringSystemSimulator:public Simulator{
 public:
 	// Construtors
 	MassSpringSystemSimulator();
-	
+
 	// UI Functions
 	const char * getTestCasesStr();
 	void initUI(DrawingUtilitiesClass * DUC);
@@ -49,6 +49,22 @@ private:
 	float m_fStiffness;
 	float m_fDamping;
 	int m_iIntegrator;
+
+	struct Masspoint {
+		Vec3 position;
+		Vec3 velocity;
+		Vec3 force;
+		bool isFixed;
+	};
+
+	struct Spring {
+		int masspoint1;
+		int masspoint2;
+		double initialLength;
+	};
+
+	vector<Masspoint> masspoints;
+	vector<Spring> springs;
 
 	// UI Attributes
 	Vec3 m_externalForce;

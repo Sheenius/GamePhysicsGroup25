@@ -8,22 +8,6 @@ MassSpringSystemSimulator::MassSpringSystemSimulator() {
 	m_iIntegrator = 0;
 }
 
-struct Masspoint {
-	Vec3 position;
-	Vec3 velocity;
-	Vec3 force;
-	bool isFixed;
-};
-
-struct Spring {
-	int masspoint1;
-	int masspoint2;
-	double initialLength;
-};
-
-vector<Masspoint> masspoints;
-vector<Spring> springs;
-
 
 void MassSpringSystemSimulator::setMass(float mass) {
 	m_fMass = mass;
