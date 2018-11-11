@@ -1,0 +1,12 @@
+
+\.vs/
+
+*.vcxproj
+
+Simulations/Win32/Debug/Simulations\.tlog/
+
+Simulations/Win32/Debug/
+
+SimulationsRunner/Debug/
+
+Win32/Debug/
