@@ -39,6 +39,7 @@ public:
 	void calculateForces();
 	void demo1(int i);
 	void setUpBasicTestscene();
+	void setUpComplexTestScene();
 	void printSolution();
 	
 	// Do Not Change
@@ -66,6 +67,11 @@ private:
 		double initialLength;
 	};
 
+	const double MASSPOINT_SIZE = 0.06;
+	const Vec3 MASSPOINT_COLOR = Vec3(1, 0, 0);
+	const Vec3 SPRING_COLOR = Vec3(0, 1, 0);
+
+	Vec3 gravity = Vec3();
 	double timestep = 0.0;
 	bool simulationMethodReadOnly = false;
 	vector<Masspoint> masspoints;

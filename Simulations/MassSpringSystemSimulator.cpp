@@ -88,16 +88,15 @@ void MassSpringSystemSimulator::reset() {
 
 
 void MassSpringSystemSimulator::drawFrame(ID3D11DeviceContext* pd3dImmediateContext) {
-	DUC->setUpLighting(Vec3(0,0,0), Vec3(1, 0, 0), 1, Vec3(1, 0, 0));
+	DUC->setUpLighting(Vec3(0,0,0), MASSPOINT_COLOR, 1, MASSPOINT_COLOR);
 	for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); ++it) {
-		DUC->drawSphere(it->position, Vec3(0.1, 0.1, 0.1));
+		DUC->drawSphere(it->position, Vec3(MASSPOINT_SIZE));
 	}
 	for (vector<Spring>::iterator it = springs.begin(); it != springs.end(); ++it) {
 		DUC->beginLine();
 		Vec3 pos1 = masspoints[it->masspoint1].position;
 		Vec3 pos2 = masspoints[it->masspoint2].position;
-		Vec3 color = Vec3(0, 1, 0);
-		DUC->drawLine(pos1, color, pos2, color);
+		DUC->drawLine(pos1, SPRING_COLOR, pos2, SPRING_COLOR);
 		DUC->endLine();
 	}
 }
@@ -114,7 +113,7 @@ void MassSpringSystemSimulator::notifyCaseChanged(int testCase) {
 		TwDefine("TweakBar/Timestep visible = false");
 	}
 	else {
-		
+		setUpComplexTestScene();
 	}
 
 	switch (testCase) {
@@ -141,14 +140,47 @@ void MassSpringSystemSimulator::setUpBasicTestscene() {
 	springs.clear();
 
 	int masspoint1, masspoint2;
-	masspoint1 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
-	masspoint2 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
-	MassSpringSystemSimulator::addSpring(masspoint1, masspoint2, 1);
+	masspoint1 = addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
+	masspoint2 = addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
+	addSpring(masspoint1, masspoint2, 1);
 
 
-	MassSpringSystemSimulator::setMass(10);
-	MassSpringSystemSimulator::setStiffness(40);
-	MassSpringSystemSimulator::setDampingFactor(0);
+	setMass(10);
+	setStiffness(40);
+	setDampingFactor(0);
+}
+
+void MassSpringSystemSimulator::setUpComplexTestScene() {
+	masspoints.clear();
+	springs.clear();
+
+	int mp1, mp2, mp3, mp4, mp5, mp6, mp7, mp8, mp9, mp10;
+	mp1 = addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
+	mp2 = addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
+	mp3 = addMassPoint(Vec3(0, 4, 0), Vec3(-1, 0, 0), false);
+	mp4 = addMassPoint(Vec3(0, 6, 0), Vec3(1, 0, 0), false);
+	mp5 = addMassPoint(Vec3(0, 8, 0), Vec3(-1, 0, 0), false);
+	mp6 = addMassPoint(Vec3(0, 10, 0), Vec3(1, 0, 0), false);
+	mp7 = addMassPoint(Vec3(0, 12, 0), Vec3(-1, 0, 0), false);
+	mp8 = addMassPoint(Vec3(0, 14, 0), Vec3(1, 0, 0), false);
+	mp9 = addMassPoint(Vec3(0, 16, 0), Vec3(-1, 0, 0), false);
+	mp10 = addMassPoint(Vec3(0, 18, 0), Vec3(1, 0, 0), true);
+
+	addSpring(mp1, mp2, 1);
+	addSpring(mp2, mp3, 1);
+	addSpring(mp3, mp4, 1);
+	addSpring(mp4, mp5, 1);
+	addSpring(mp5, mp6, 1);
+	addSpring(mp6, mp7, 1);
+	addSpring(mp7, mp8, 1);
+	addSpring(mp8, mp9, 1);
+	addSpring(mp9, mp10, 1);
+	//addMassPoint(Vec3(), Vec3(), false);
+
+	gravity = Vec3(0, -10, 0);
+	setMass(10);
+	setStiffness(200);
+	setDampingFactor(0.01);
 }
 
 void MassSpringSystemSimulator::demo1(int i) {
@@ -181,7 +213,7 @@ void MassSpringSystemSimulator::externalForcesCalculations(float timeElapsed) {
 
 void MassSpringSystemSimulator::calculateForces() {
 	for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); ++it) {
-		it->force = 0;
+		it->force = gravity * m_fMass - m_fDamping * it->velocity;
 	}
 	for (vector<Spring>::iterator it = springs.begin(); it != springs.end(); ++it) {
 		Spring spring = *it;
@@ -203,7 +235,9 @@ void MassSpringSystemSimulator::simulateTimestep(float timeStep) {
 	calculateForces();
 	if (m_iIntegrator == EULER) {
 		for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); ++it) {
-			it->position += it->velocity * timeStep;
+			if (!it->isFixed) {
+				it->position += it->velocity * timeStep;
+			}
 			it->velocity += it->force / m_fMass * timeStep;
 		}
 	}
@@ -220,14 +254,28 @@ void MassSpringSystemSimulator::simulateTimestep(float timeStep) {
 		}
 		calculateForces();
 		for (int i = 0; i < masspoints.size(); i++) {
-			masspoints[i].position = oldPositions[i] + masspoints[i].velocity * timeStep;
+			if (!masspoints[i].isFixed) {
+				masspoints[i].position = oldPositions[i] + masspoints[i].velocity * timeStep;
+			}
+			else {
+				masspoints[i].position = oldPositions[i];
+			}
 			masspoints[i].velocity = oldVelocities[i] + masspoints[i].force / m_fMass * timeStep;
 		}
 	}
 	else if (m_iIntegrator == LEAPFROG) {
 		for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); ++it) {
 			it->velocity += it->force / m_fMass * timeStep;
-			it->position += it->velocity * timeStep;
+			if (!it->isFixed){
+				it->position += it->velocity * timeStep;
+			}
+		}
+	}
+
+	for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); it++) {
+		if (it->position.y - MASSPOINT_SIZE < -1.0) {
+			it->position.y = -1.0 + MASSPOINT_SIZE;
+			it->velocity = reflectVector(it->velocity, Vec3(0, 1, 0));
 		}
 	}
 }
