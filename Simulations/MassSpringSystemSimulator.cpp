@@ -114,6 +114,9 @@ void MassSpringSystemSimulator::notifyCaseChanged(int testCase) {
 	}
 	else {
 		setUpComplexTestScene();
+		TwAddVarRW(DUC->g_pTweakBar, "Mass", TW_TYPE_FLOAT, &m_fMass, "min = 0 max = 100");
+		TwAddVarRW(DUC->g_pTweakBar, "Stiffness", TW_TYPE_FLOAT, &m_fStiffness, "min = 0 max = 10000");
+		TwAddVarRW(DUC->g_pTweakBar, "Damping", TW_TYPE_FLOAT, &m_fDamping, "min = 0 max = 100 step = 0.01");
 	}
 
 	switch (testCase) {
