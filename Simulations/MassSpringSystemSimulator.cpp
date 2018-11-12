@@ -55,13 +55,30 @@ Vec3 MassSpringSystemSimulator::getVelocityOfMassPoint(int index) {
 }
 
 void MassSpringSystemSimulator::applyExternalForce(Vec3 force) {
-
+	
 }
 
 
 
-
 //UI Functions
+/*void MassSpringSystemSimulator::keyboard() {
+	if (GetKeyState(VK_LEFT) == 1)
+	{
+		applyExternalForce(Vec3(-1, 0, 0));
+	}
+	if (GetKeyState(VK_RIGHT) == 1)
+	{
+		applyExternalForce(Vec3(1, 0, 0));
+	}
+	if (GetKeyState(VK_UP) == 1)
+	{
+		applyExternalForce(Vec3(1, 0, 0));
+	}
+	if (GetKeyState(VK_DOWN) == 1)
+	{
+		applyExternalForce(Vec3(-1, 0, 0));
+	}
+}*/
 
 
 //Print solution in Commandline
@@ -158,26 +175,27 @@ void MassSpringSystemSimulator::setUpComplexTestScene() {
 	springs.clear();
 
 	int mp1, mp2, mp3, mp4, mp5, mp6, mp7, mp8, mp9, mp10;
-	mp1 = addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
-	mp2 = addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
-	mp3 = addMassPoint(Vec3(0, 4, 0), Vec3(-1, 0, 0), false);
-	mp4 = addMassPoint(Vec3(0, 6, 0), Vec3(1, 0, 0), false);
-	mp5 = addMassPoint(Vec3(0, 8, 0), Vec3(-1, 0, 0), false);
-	mp6 = addMassPoint(Vec3(0, 10, 0), Vec3(1, 0, 0), false);
-	mp7 = addMassPoint(Vec3(0, 12, 0), Vec3(-1, 0, 0), false);
-	mp8 = addMassPoint(Vec3(0, 14, 0), Vec3(1, 0, 0), false);
-	mp9 = addMassPoint(Vec3(0, 16, 0), Vec3(-1, 0, 0), false);
-	mp10 = addMassPoint(Vec3(0, 18, 0), Vec3(1, 0, 0), true);
+	mp1 = addMassPoint(Vec3(-1, 2, 0), Vec3(-1, 0, 0), false);
+	mp2 = addMassPoint(Vec3(-2, 1, 0), Vec3(1, 0, 0), false);
+	mp3 = addMassPoint(Vec3(-2, -1, 0), Vec3(-1, 0, 0), false);
+	mp4 = addMassPoint(Vec3(-1, -2, 0), Vec3(1, 0, 0), false);
+	mp5 = addMassPoint(Vec3(0, -3, 0), Vec3(-1, 0, 0), false);
+	mp6 = addMassPoint(Vec3(1, -2, 0), Vec3(1, 0, 0), false);
+	mp7 = addMassPoint(Vec3(2, -1, 0), Vec3(-1, 0, 0), false);
+	mp8 = addMassPoint(Vec3(2, 1, 0), Vec3(1, 0, 0), false);
+	mp9 = addMassPoint(Vec3(1, 2, 0), Vec3(-1, 0, 0), false);
+	mp10 = addMassPoint(Vec3(0, 3, 0), Vec3(1, 0, 0), true);
 
-	addSpring(mp1, mp2, 1);
-	addSpring(mp2, mp3, 1);
-	addSpring(mp3, mp4, 1);
-	addSpring(mp4, mp5, 1);
-	addSpring(mp5, mp6, 1);
-	addSpring(mp6, mp7, 1);
-	addSpring(mp7, mp8, 1);
-	addSpring(mp8, mp9, 1);
-	addSpring(mp9, mp10, 1);
+	addSpring(mp1, mp4, 1);
+	addSpring(mp4, mp7, 1);
+	addSpring(mp7, mp10, 1);
+	addSpring(mp10, mp3, 1);
+	addSpring(mp3, mp6, 1);
+	addSpring(mp6, mp9, 1);
+	addSpring(mp9, mp2, 1);
+	addSpring(mp2, mp5, 1);
+	addSpring(mp5, mp8, 1);
+	addSpring(mp8, mp1, 1); //Ring :D
 	//addMassPoint(Vec3(), Vec3(), false);
 
 	gravity = Vec3(0, -10, 0);

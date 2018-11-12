@@ -24,6 +24,7 @@ public:
 	void simulateTimestep(float timeStep);
 	void onClick(int x, int y);
 	void onMouse(int x, int y);
+	/*void keyboard();*/
 
 	// Specific Functions
 	void setMass(float mass);
