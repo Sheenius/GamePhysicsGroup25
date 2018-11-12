@@ -37,6 +37,9 @@ public:
 	Vec3 getVelocityOfMassPoint(int index);
 	void applyExternalForce(Vec3 force);
 	void calculateForces();
+	void demo1(int i);
+	void setUpBasicTestscene();
+	void printSolution();
 	
 	// Do Not Change
 	void setIntegrator(int integrator) {
@@ -63,6 +66,8 @@ private:
 		double initialLength;
 	};
 
+	double timestep = 0.0;
+	bool simulationMethodReadOnly = false;
 	vector<Masspoint> masspoints;
 	vector<Spring> springs;
 

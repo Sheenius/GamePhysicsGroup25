@@ -1,6 +1,5 @@
 #include "MassSpringSystemSimulator.h"
 
-
 MassSpringSystemSimulator::MassSpringSystemSimulator() {
 	m_fMass = 0;
 	m_fStiffness = 0;
@@ -75,7 +74,10 @@ void MassSpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC) {
 	this->DUC = DUC;
 	
 	TwType TW_TYPE_TESTCASE = TwDefineEnumFromString("Simulation Method", "Euler, Leapfrog, Midstep");
-	TwAddVarRW(DUC->g_pTweakBar, "Simulation Method", TW_TYPE_TESTCASE, &m_iIntegrator, "");
+	TwAddVarRW(DUC->g_pTweakBar, "SimulationMethod", TW_TYPE_TESTCASE, &m_iIntegrator, "");
+	if (simulationMethodReadOnly) {
+		TwDefine("TweakBar/SimulationMethod readonly = true");
+	}
 }
 
 void MassSpringSystemSimulator::reset() {
@@ -103,20 +105,72 @@ void MassSpringSystemSimulator::drawFrame(ID3D11DeviceContext* pd3dImmediateCont
 void MassSpringSystemSimulator::notifyCaseChanged(int testCase) {
 	m_iTestCase = testCase;
 
+	simulationMethodReadOnly = false;
+
+
+	if (testCase < 3) {
+		setUpBasicTestscene();
+
+		TwDefine("TweakBar/Timestep visible = false");
+	}
+	else {
+		
+	}
+
+	switch (testCase) {
+	case 0:
+		demo1(0);
+		break;
+	case 1:
+		timestep = 0.005;
+		m_iIntegrator = EULER;
+		simulationMethodReadOnly = true;
+		break;
+	case 2:
+		timestep = 0.005;
+		m_iIntegrator = MIDPOINT;
+		simulationMethodReadOnly = true;
+		break;
+	case 3:
+		break;
+	}
+}
+
+void MassSpringSystemSimulator::setUpBasicTestscene() {
 	masspoints.clear();
 	springs.clear();
 
-	if (testCase < 3) {
-		int masspoint1, masspoint2;
-		masspoint1 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
-		masspoint2 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
-		MassSpringSystemSimulator::addSpring(masspoint1, masspoint2, 1);
+	int masspoint1, masspoint2;
+	masspoint1 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 0, 0), Vec3(-1, 0, 0), false);
+	masspoint2 = MassSpringSystemSimulator::addMassPoint(Vec3(0, 2, 0), Vec3(1, 0, 0), false);
+	MassSpringSystemSimulator::addSpring(masspoint1, masspoint2, 1);
 
 
-		MassSpringSystemSimulator::setMass(10);
-		MassSpringSystemSimulator::setStiffness(40);
-		MassSpringSystemSimulator::setDampingFactor(0);
-	}
+	MassSpringSystemSimulator::setMass(10);
+	MassSpringSystemSimulator::setStiffness(40);
+	MassSpringSystemSimulator::setDampingFactor(0);
+}
+
+void MassSpringSystemSimulator::demo1(int i) {
+	m_iIntegrator = EULER;
+	simulateTimestep(0.1);
+	cout << "EULER:\n";
+	printSolution();
+
+	setUpBasicTestscene();
+	m_iIntegrator = MIDPOINT;
+	simulateTimestep(0.1);
+	cout << "\nMIDPOINT:\n";
+	printSolution();
+}
+
+void MassSpringSystemSimulator::printSolution() {
+	for (int i = 0; i < masspoints.size(); i++) {
+		cout << "Masspoint " << i << ":\n";
+		cout << "  x = " << masspoints[i].position.x << "\n";
+		cout << "  y = " << masspoints[i].position.y << "\n";
+		cout << "  z = " << masspoints[i].position.z << "\n";
+	}	
 }
 
 
@@ -142,6 +196,9 @@ void MassSpringSystemSimulator::calculateForces() {
 }
 
 void MassSpringSystemSimulator::simulateTimestep(float timeStep) {
+	if (timestep != 0 && m_iTestCase < 3) {
+		timeStep = timestep;
+	}
 	//MassSpringSystemSimulator::externalForcesCalculations(timeStep)
 	calculateForces();
 	if (m_iIntegrator == EULER) {
@@ -165,6 +222,12 @@ void MassSpringSystemSimulator::simulateTimestep(float timeStep) {
 		for (int i = 0; i < masspoints.size(); i++) {
 			masspoints[i].position = oldPositions[i] + masspoints[i].velocity * timeStep;
 			masspoints[i].velocity = oldVelocities[i] + masspoints[i].force / m_fMass * timeStep;
+		}
+	}
+	else if (m_iIntegrator == LEAPFROG) {
+		for (vector<Masspoint>::iterator it = masspoints.begin(); it != masspoints.end(); ++it) {
+			it->velocity += it->force / m_fMass * timeStep;
+			it->position += it->velocity * timeStep;
 		}
 	}
 }
