@@ -168,6 +168,7 @@ void MassSpringSystemSimulator::setUpBasicTestscene() {
 	setMass(10);
 	setStiffness(40);
 	setDampingFactor(0);
+	gravity = 0;
 }
 
 void MassSpringSystemSimulator::setUpComplexTestScene() {
