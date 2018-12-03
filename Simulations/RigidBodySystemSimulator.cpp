@@ -48,6 +48,20 @@ void RigidBodySystemSimulator::drawFrame(ID3D11DeviceContext * pd3dImmediateCont
 }
 
 void RigidBodySystemSimulator::demo1() {
+	simulateTimestep(0.1);
+}
+
+//Noch ändern
+void RigidBodySystemSimulator::printSolution() {
+	for (int i = 0; i < rigidbodies.size(); i++) {
+		cout << "Masspoint " << i << ":\n";
+		cout << "  x = " << rigidbodies[i].position.x << "\n";
+		cout << "  y = " << rigidbodies[i].position.y << "\n";
+		cout << "  z = " << rigidbodies[i].position.z << "\n";
+	}
+}
+
+void RigidBodySystemSimulator::demo2() {
 	addRigidBody(Vec3(0, 0, 0), Vec3(1, 0.6, 0.5), 2);
 	matrix4x4<double> rotationMatrix = matrix4x4<double>();
 	rotationMatrix.initRotationZ(90);
@@ -59,10 +73,6 @@ void RigidBodySystemSimulator::demo1() {
 	force.position = Vec3(0.3, 0.5, 0.25);
 	force.force = Vec3(100, 100, 0);
 	forces.push_back(force);
-}
-
-void RigidBodySystemSimulator::demo2() {
-
 }
 
 void RigidBodySystemSimulator::demo3() {
