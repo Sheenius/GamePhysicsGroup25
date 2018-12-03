@@ -73,7 +73,7 @@ void RigidBodySystemSimulator::printSolution() {
 		cout << "  linearVelocity = " << getLinearVelocityOfRigidBody(i) << "\n";
 		cout << "  angularVelocity = " << getAngularVelocityOfRigidBody(i) << "\n";
 		//the world space velocity of point (0.3, 0.5, 0.25)?
-		cout << "  wordSpaceVelocity = " << cross(getAngularVelocityOfRigidBody(i), Vec3(0.3, 0.5, 0.25) - rigidbodies[i].position) + rigidbodies[i] .linearVelocity << "\n";
+		cout << "  wordSpaceVelocity = " << cross(getAngularVelocityOfRigidBody(i), Vec3(-0.3f, -0.5f, -0.25f) - rigidbodies[i].position) + rigidbodies[i].linearVelocity << "\n";
 	}
 }
 
@@ -179,7 +179,7 @@ void RigidBodySystemSimulator::collisionDetection() {
 				break;
 			}
 
-			//Calculate angular velocities
+			//Calculate inertia tensors and angular velocities
 			rotationMatrix = bodyA.orientation.getRotMat();
 			matrix4x4<double> rotationMatrixTransposed = bodyA.orientation.getRotMat();
 			rotationMatrixTransposed.transpose();
@@ -205,16 +205,17 @@ void RigidBodySystemSimulator::collisionDetection() {
 			}
 
 			//Calculate impulse
-			double a = (dot(-(1 + BOUNCINESS) * relativeVelocity, collision.normalWorld));
+			double a = -(1 + BOUNCINESS) * dot(relativeVelocity, collision.normalWorld);
 			double b = 1.0 / bodyA.mass + 1.0 / bodyB.mass;
-			Vec3 c = inertiaTensorA.transformVector(cross(cross(collisionPointA, collision.normalWorld), collisionPointA));
-			Vec3 d = inertiaTensorB.transformVector(cross(cross(collisionPointB, collision.normalWorld), collisionPointB));
+			Vec3 c = cross(inertiaTensorA.transformVector(cross(collisionPointA, collision.normalWorld)), collisionPointA);
+			Vec3 d = cross(inertiaTensorB.transformVector(cross(collisionPointB, collision.normalWorld)), collisionPointB);
 			double e = dot(c + d, collision.normalWorld);
 			double impulse = a / (b + e);
 
 			//Uncollide objects
 			//rigidbodies[i].position += collision.depth * collision.normalWorld;
 			//rigidbodies[j].position -= collision.depth * collision.normalWorld;
+
 			//Apply impulse
 			rigidbodies[i].linearVelocity += impulse * collision.normalWorld / bodyA.mass;
 			rigidbodies[j].linearVelocity -= impulse * collision.normalWorld / bodyB.mass;
