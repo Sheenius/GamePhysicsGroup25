@@ -66,11 +66,11 @@ void RigidBodySystemSimulator::demo1() {
 	printSolution();
 }
 
-//Noch ändern
+//Noch ï¿½ndern
 void RigidBodySystemSimulator::printSolution() {
 	for (int i = 0; i < rigidbodies.size(); i++) {
 		cout << "Rigidbody " << i << ":\n";
-		cout << "  linearVelocity = " << rigidbodies[i].linearVelocity << "\n";
+		cout << "  linearVelocity = " << getLinearVelocityOfRigidBody(i) << "\n";
 		cout << "  angularVelocity = " << getAngularVelocityOfRigidBody(i) << "\n";
 		//the world space velocity of point (0.3, 0.5, 0.25)?
 		cout << "  wordSpaceVelocity = " << cross(getAngularVelocityOfRigidBody(i), Vec3(0.3, 0.5, 0.25) - rigidbodies[i].position) + rigidbodies[i] .linearVelocity << "\n";
