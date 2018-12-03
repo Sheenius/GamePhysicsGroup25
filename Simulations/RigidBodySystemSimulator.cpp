@@ -59,10 +59,10 @@ void RigidBodySystemSimulator::demo1() {
 	Force force;
 	force.rigidbody = 0;
 	force.position = Vec3(0.3, 0.5, 0.25);
-	force.force = Vec3(100, 100, 0);
+	force.force = Vec3(1, 1, 0);
 	forces.push_back(force);
 	//Ende
-	simulateTimestep(0.1);
+	simulateTimestep(2.0);
 	printSolution();
 }
 
@@ -71,9 +71,9 @@ void RigidBodySystemSimulator::printSolution() {
 	for (int i = 0; i < rigidbodies.size(); i++) {
 		cout << "Rigidbody " << i << ":\n";
 		cout << "  linearVelocity = " << rigidbodies[i].linearVelocity << "\n";
-		cout << "  angularMomentum = " << rigidbodies[i].angularMomentum << "\n";
+		cout << "  angularVelocity = " << getAngularVelocityOfRigidBody(i) << "\n";
 		//the world space velocity of point (0.3, 0.5, 0.25)?
-		cout << "  wordSpaceVelocity = " << cross(Vec3(0.3, 0.5, 0.25) - rigidbodies[i].position, rigidbodies[i].angularMomentum) + rigidbodies[i] .linearVelocity << "\n";
+		cout << "  wordSpaceVelocity = " << cross(getAngularVelocityOfRigidBody(i), Vec3(0.3, 0.5, 0.25) - rigidbodies[i].position) + rigidbodies[i] .linearVelocity << "\n";
 	}
 }
 
@@ -103,20 +103,22 @@ void RigidBodySystemSimulator::demo3() {
 }
 //Fix this collision
 void RigidBodySystemSimulator::demo4() {
-	addRigidBody(Vec3(-1, 0, 0), Vec3(0.5, 0.5, 0.5), 2);
-	addRigidBody(Vec3(1, 0, 0.1), Vec3(0.5, 0.5, 0.5), 3);
-	addRigidBody(Vec3(0, 1, 0), Vec3(0.5, 0.5, 0.5), 4);
-	addRigidBody(Vec3(-0.1, -1, 0), Vec3(0.5, 0.5, 0.5), 1);
-	setVelocityOf(0, Vec3(1, 0, 0));
-	setVelocityOf(1, Vec3(-0.5, 0, 0));
+	addRigidBody(Vec3(-1, 0, 0), Vec3(0.5, 0.5, 0.5), 4);
+	//addRigidBody(Vec3(1, 0, 0.1), Vec3(0.5, 0.5, 0.5), 3);
+	//addRigidBody(Vec3(0, 1, 0), Vec3(0.5, 0.5, 0.5), 4);
+	addRigidBody(Vec3(0, -1, 0), Vec3(100, 0.01, 100), 1000000);
+	//rigidbodies[1].isFixed = true;
+	setVelocityOf(0, Vec3(0, -1, 0));
+	/*setVelocityOf(1, Vec3(-0.5, 0, 0));
 	setVelocityOf(2, Vec3(0, -0.5, 0));
-	setVelocityOf(3, Vec3(0, 1, 0));
+	setVelocityOf(3, Vec3(0, 0, 0));*/
 	matrix4x4<double> rotation = matrix4x4<double>(0);
 	rotation.initRotationXYZ(40, 40, 0);
 	setOrientationOf(0, Quaternion<double>(rotation));
-	setOrientationOf(1, Quaternion<double>(rotation));
-	setOrientationOf(2, Quaternion<double>(rotation));
-	setOrientationOf(3, Quaternion<double>(rotation));
+	//setOrientationOf(1, Quaternion<double>(rotation));
+	//setOrientationOf(2, Quaternion<double>(rotation));
+	//setOrientationOf(3, Quaternion<double>(rotation));
+	//gravity = Vec3(0, -10, 0);
 }
 
 void RigidBodySystemSimulator::notifyCaseChanged(int testCase)
@@ -188,13 +190,13 @@ void RigidBodySystemSimulator::collisionDetection() {
 			rotationMatrixTransposed = bodyB.orientation.getRotMat();
 			rotationMatrixTransposed.transpose();
 			matrix4x4<double> inertiaTensorB = rotationMatrixTransposed * bodyB.inertiaTensor * rotationMatrix;
-			Vec3 angularVelocityB = inertiaTensorB.transformVector(bodyA.angularMomentum);
+			Vec3 angularVelocityB = inertiaTensorB.transformVector(bodyB.angularMomentum);
 
 			//Calculate relative velocity
 			Vec3 collisionPointA = collision.collisionPointWorld - bodyA.position;
 			Vec3 collisionPointB = collision.collisionPointWorld - bodyB.position;
-			Vec3 velocityA = bodyA.linearVelocity + cross(collisionPointA, angularVelocityA);
-			Vec3 velocityB = bodyB.linearVelocity + cross(collisionPointB, angularVelocityB);
+			Vec3 velocityA = bodyA.linearVelocity + cross(angularVelocityA, collisionPointA);
+			Vec3 velocityB = bodyB.linearVelocity + cross(angularVelocityB, collisionPointB);
 			Vec3 relativeVelocity = velocityA - velocityB;
 			
 			//Check if bodies are seperating
@@ -234,23 +236,27 @@ void RigidBodySystemSimulator::simulateTimestep(float timestep)
 		rigidbodies[it->rigidbody].torque += cross(it->position - rigidbodies[it->rigidbody].position, it->force);
 	}
 	forces.clear();
-	for (vector<Rigidbody>::iterator it = rigidbodies.begin(); it != rigidbodies.end(); ++it) {
+	for (int i = 0; i < rigidbodies.size(); i++) {
+		if (rigidbodies[i].isFixed) {
+			break;
+		}
+
 		//Integrate position
-		it->position += it->linearVelocity * timestep;
+		rigidbodies[i].position += rigidbodies[i].linearVelocity * timestep;
 		//Integrate linear velocity
-		it->linearVelocity += it->force / it->mass * timestep;
+		rigidbodies[i].linearVelocity += rigidbodies[i].force / rigidbodies[i].mass * timestep;
 
 		//Integrate orientation
-		matrix4x4<double> rotationMatrix = it->orientation.getRotMat();
+		/*matrix4x4<double> rotationMatrix = it->orientation.getRotMat();
 		matrix4x4<double> rotationMatrixTransposed = it->orientation.getRotMat();
 		rotationMatrixTransposed.transpose();
-		matrix4x4<double> inertiaTensor = rotationMatrixTransposed * it->inertiaTensor * rotationMatrix;
-		Vec3 angularVelocity = inertiaTensor.transformVector(it->angularMomentum);
-		it->orientation = it->orientation + timestep / 2.0 * Quaternion<double>(angularVelocity.x, angularVelocity.y, angularVelocity.z, 0) * it->orientation;
+		matrix4x4<double> inertiaTensor = rotationMatrixTransposed * it->inertiaTensor * rotationMatrix;*/
+		Vec3 angularVelocity = getAngularVelocityOfRigidBody(i);
+		rigidbodies[i].orientation = rigidbodies[i].orientation + timestep / 2.0 * Quaternion<double>(angularVelocity.x, angularVelocity.y, angularVelocity.z, 0) * rigidbodies[i].orientation;
 		//it->orientation /= it->orientation.norm();
-		it->orientation = it->orientation.unit();
+		rigidbodies[i].orientation = rigidbodies[i].orientation.unit();
 		//Integrate angular momentum
-		it->angularMomentum += timestep * it->torque;
+		rigidbodies[i].angularMomentum += timestep * rigidbodies[i].torque;
 
 		collisionDetection();
 	}
@@ -317,7 +323,7 @@ matrix4x4<double> RigidBodySystemSimulator::calculateInertiaTensor(double mass, 
 	return inertiaTensor.inverse();
 }
 
-void RigidBodySystemSimulator::addRigidBody(Vec3 position, Vec3 size, int mass)
+void RigidBodySystemSimulator::addRigidBody(Vec3 position, Vec3 size, double mass)
 {
 	Rigidbody rigidbody;
 	rigidbody.position = position;
