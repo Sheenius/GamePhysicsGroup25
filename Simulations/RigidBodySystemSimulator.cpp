@@ -48,16 +48,32 @@ void RigidBodySystemSimulator::drawFrame(ID3D11DeviceContext * pd3dImmediateCont
 }
 
 void RigidBodySystemSimulator::demo1() {
+	addRigidBody(Vec3(0, 0, 0), Vec3(1, 0.6, 0.5), 2);
+	//Attribute? Bzw. was brauchen wir davon wirklich?
+	//Start
+	matrix4x4<double> rotationMatrix = matrix4x4<double>();
+	rotationMatrix.initRotationZ(90);
+	Quaternion<double> rotationQuaternion = Quaternion<double>(rotationMatrix);
+	setOrientationOf(0, rotationQuaternion);
+
+	Force force;
+	force.rigidbody = 0;
+	force.position = Vec3(0.3, 0.5, 0.25);
+	force.force = Vec3(100, 100, 0);
+	forces.push_back(force);
+	//Ende
 	simulateTimestep(0.1);
+	printSolution();
 }
 
 //Noch ändern
 void RigidBodySystemSimulator::printSolution() {
 	for (int i = 0; i < rigidbodies.size(); i++) {
-		cout << "Masspoint " << i << ":\n";
-		cout << "  x = " << rigidbodies[i].position.x << "\n";
-		cout << "  y = " << rigidbodies[i].position.y << "\n";
-		cout << "  z = " << rigidbodies[i].position.z << "\n";
+		cout << "Rigidbody " << i << ":\n";
+		cout << "  linearVelocity = " << rigidbodies[i].linearVelocity << "\n";
+		cout << "  angularMomentum = " << rigidbodies[i].angularMomentum << "\n";
+		//the world space velocity of point (0.3, 0.5, 0.25)?
+		//cout << "  wordSpaceVelocity = " << rigidbodies[i].insertHere << "\n";
 	}
 }
 
