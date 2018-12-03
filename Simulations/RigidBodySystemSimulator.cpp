@@ -76,10 +76,6 @@ void RigidBodySystemSimulator::demo2() {
 }
 
 void RigidBodySystemSimulator::demo3() {
-
-}
-
-void RigidBodySystemSimulator::demo4() {
 	addRigidBody(Vec3(-1, 0, 0), Vec3(0.5, 0.5, 0.5), 2);
 	addRigidBody(Vec3(1, 0, 0.1), Vec3(0.5, 0.5, 0.5), 3);
 	setVelocityOf(0, Vec3(1, 0, 0));
@@ -87,6 +83,23 @@ void RigidBodySystemSimulator::demo4() {
 	matrix4x4<double> rotation = matrix4x4<double>(0);
 	rotation.initRotationXYZ(40, 40, 0);
 	setOrientationOf(1, Quaternion<double>(rotation));
+}
+//Fix this collision
+void RigidBodySystemSimulator::demo4() {
+	addRigidBody(Vec3(-1, 0, 0), Vec3(0.5, 0.5, 0.5), 2);
+	addRigidBody(Vec3(1, 0, 0.1), Vec3(0.5, 0.5, 0.5), 3);
+	addRigidBody(Vec3(0, 1, 0), Vec3(0.5, 0.5, 0.5), 4);
+	addRigidBody(Vec3(-0.1, -1, 0), Vec3(0.5, 0.5, 0.5), 1);
+	setVelocityOf(0, Vec3(1, 0, 0));
+	setVelocityOf(1, Vec3(-0.5, 0, 0));
+	setVelocityOf(2, Vec3(0, -0.5, 0));
+	setVelocityOf(3, Vec3(0, 1, 0));
+	matrix4x4<double> rotation = matrix4x4<double>(0);
+	rotation.initRotationXYZ(40, 40, 0);
+	setOrientationOf(0, Quaternion<double>(rotation));
+	setOrientationOf(1, Quaternion<double>(rotation));
+	setOrientationOf(2, Quaternion<double>(rotation));
+	setOrientationOf(3, Quaternion<double>(rotation));
 }
 
 void RigidBodySystemSimulator::notifyCaseChanged(int testCase)
