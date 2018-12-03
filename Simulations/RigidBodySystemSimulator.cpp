@@ -99,6 +99,8 @@ void RigidBodySystemSimulator::demo3() {
 	matrix4x4<double> rotation = matrix4x4<double>(0);
 	rotation.initRotationXYZ(40, 40, 0);
 	setOrientationOf(1, Quaternion<double>(rotation));
+	//Do some interaction stuff here or in case2?
+
 }
 //Fix this collision
 void RigidBodySystemSimulator::demo4() {
@@ -131,6 +133,8 @@ void RigidBodySystemSimulator::notifyCaseChanged(int testCase)
 		break;
 	case 2:
 		demo3();
+		//Do some interaction stuff here or in demo3()?
+		//externalForcesCalculations(time);???
 		break;
 	case 3:
 		demo4();
@@ -140,6 +144,14 @@ void RigidBodySystemSimulator::notifyCaseChanged(int testCase)
 
 void RigidBodySystemSimulator::externalForcesCalculations(float timeElapsed)
 {
+	//Mouseposition mit Rigidbodyposition abgleichen? Wie geht das?
+	for (int i = 0; i < rigidbodies.size(); i++)
+	{
+		if (m_trackmouse.x == rigidbodies[i].position.x && m_trackmouse.y == rigidbodies[i].position.y)
+		{
+			applyForceOnBody(i, Vec3(0.3, 0.5, 0.25),  Vec3(100, 100, 0));
+		}
+	}
 }
 
 void RigidBodySystemSimulator::collisionDetection() {
@@ -247,10 +259,16 @@ void RigidBodySystemSimulator::simulateTimestep(float timestep)
 
 void RigidBodySystemSimulator::onClick(int x, int y)
 {
+	m_trackmouse.x = x;
+	m_trackmouse.y = y;
 }
 
 void RigidBodySystemSimulator::onMouse(int x, int y)
 {
+	m_oldtrackmouse.x = x;
+	m_oldtrackmouse.y = y;
+	m_trackmouse.x = x;
+	m_trackmouse.y = y;
 }
 
 int RigidBodySystemSimulator::getNumberOfRigidBodies()
