@@ -73,7 +73,7 @@ void RigidBodySystemSimulator::printSolution() {
 		cout << "  linearVelocity = " << rigidbodies[i].linearVelocity << "\n";
 		cout << "  angularMomentum = " << rigidbodies[i].angularMomentum << "\n";
 		//the world space velocity of point (0.3, 0.5, 0.25)?
-		//cout << "  wordSpaceVelocity = " << rigidbodies[i].insertHere << "\n";
+		cout << "  wordSpaceVelocity = " << cross(Vec3(0.3, 0.5, 0.25) - rigidbodies[i].position, rigidbodies[i].angularMomentum) + rigidbodies[i] .linearVelocity << "\n";
 	}
 }
 
@@ -89,6 +89,7 @@ void RigidBodySystemSimulator::demo2() {
 	force.position = Vec3(0.3, 0.5, 0.25);
 	force.force = Vec3(100, 100, 0);
 	forces.push_back(force);
+	//Do some interaction stuff here or in case1?
 }
 
 void RigidBodySystemSimulator::demo3() {
@@ -99,8 +100,6 @@ void RigidBodySystemSimulator::demo3() {
 	matrix4x4<double> rotation = matrix4x4<double>(0);
 	rotation.initRotationXYZ(40, 40, 0);
 	setOrientationOf(1, Quaternion<double>(rotation));
-	//Do some interaction stuff here or in case2?
-
 }
 //Fix this collision
 void RigidBodySystemSimulator::demo4() {
@@ -130,11 +129,11 @@ void RigidBodySystemSimulator::notifyCaseChanged(int testCase)
 		break;
 	case 1:
 		demo2();
+		//Do some interaction stuff here or in demo2()?
+		//externalForcesCalculations(time);???
 		break;
 	case 2:
 		demo3();
-		//Do some interaction stuff here or in demo3()?
-		//externalForcesCalculations(time);???
 		break;
 	case 3:
 		demo4();
