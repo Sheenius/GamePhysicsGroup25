@@ -1,4 +1,4 @@
-﻿#include "SphereSystemSimulator.h"
+#include "SphereSystemSimulator.h"
 
 std::function<float(float)> SphereSystemSimulator::m_Kernels[5] = {
 	[](float x) {return 1.0f; },              // Constant, m_iKernel = 0
@@ -140,10 +140,6 @@ void SphereSystemSimulator::notifyCaseChanged(int testCase)
 		m_pSphereSystemGrid->position = Vec3(0.0001, 0.0001, 0.0001);
 		m_pSphereSystemGrid->notifyCaseChanged(1);
 		m_pSphereSystemGrid->initUI(DUC);
-		/////////////////////////////////
-		//To Do                        //
-		//CYNTHIA                      //
-		/////////////////////////////////
 	}
 }
 
