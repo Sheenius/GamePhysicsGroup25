@@ -1,6 +1,7 @@
 #ifndef SPHSYSTEMSIMULATOR_h
 #define SPHSYSTEMSIMULATOR_h
 #include "Simulator.h"
+#include "util/timer.h"
 //#include "spheresystem.h", add your sphere system header file
 
 #define NAIVEACC 0

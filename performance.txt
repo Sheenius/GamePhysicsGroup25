@@ -1,0 +1,10 @@
+For 100 steps:
+
+		Naive			Grid
+100		   500ms		   400ms
+1000		38,200ms		 3,800ms
+10000		>30s for single step	36,600ms
+
+The values are rounded averages of four repetitions.
+The setup for the test can be seen as a comment in the initialize() method. In the nested loop k was iterated 1, 10 and 100 times to generate the given number of spheres.
+m_fRadius = 0.005f was used.

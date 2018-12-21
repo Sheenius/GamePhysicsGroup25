@@ -39,6 +39,26 @@ void SphereSystemSimulator::initialize(int n) {
 	float y = -0.45f;
 	float z = -0.45f;
 	float step = 0.9f / n / 3;
+	/*m_iAccelerator = GRIDACC;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			for (int k = 0; k < 1; k++) {
+				Sphere sphere;
+				sphere.position = Vec3(x + i * 0.08, y + j * 0.08, z + k * 0.008);
+				sphere.velocity = Vec3(0, 0, 0);
+				sphere.force = Vec3(0, 0, 0);
+				spheres.push_back(sphere);
+			}
+		}
+	}
+
+	MuTime time;
+	time.get();
+	for (int i = 0; i < 100; i++) {
+		this->simulateTimestep(0.001);
+	}
+	std::cout << "Time passed " << time.update().time << " milliseconds\n";*/
+
 	for (int i = 0; i < n; i++) {
 		Sphere sphere;
 		sphere.position = Vec3(x, y, z);
