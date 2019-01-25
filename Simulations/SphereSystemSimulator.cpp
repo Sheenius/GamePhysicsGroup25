@@ -18,7 +18,7 @@ SphereSystemSimulator::SphereSystemSimulator()
 	m_fDrawnRadius = 0.2f;
 	m_fForceScaling = 10.0f;
 	m_fDamping = 10.0f;
-	m_iNumSpheres = 100;
+	m_iNumSpheres = 500;
 	m_fGravity = 0;
 	m_iAccelerator = NAIVEACC;
 	position = Vec3(0, 0, 0);

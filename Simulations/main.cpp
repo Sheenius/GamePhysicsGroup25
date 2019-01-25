@@ -23,7 +23,8 @@ using namespace GamePhysics;
 //#define TEMPLATE_DEMO
 //#define MASS_SPRING_SYSTEM
 //#define RIGID_BODY_SYSTEM
-#define SPHERE_SYSTEM
+//#define SPHERE_SYSTEM
+#define RIGID_BODY_SPRING_SYSTEM
 
 #ifdef TEMPLATE_DEMO
 #include "TemplateSimulator.h"
@@ -38,9 +39,13 @@ using namespace GamePhysics;
 #include "SphereSystemSimulator.h"
 #endif
 
+#ifdef RIGID_BODY_SPRING_SYSTEM
+#include "RigidBodySpringSystemSimulator.h"
+#endif
+
 DrawingUtilitiesClass * g_pDUC;
 Simulator * g_pSimulator;
-float 	g_fTimestep = 0.001;
+float 	g_fTimestep = 0.0001;
 #ifdef ADAPTIVESTEP
 float   g_fTimeFactor = 1;
 #endif
@@ -367,6 +372,9 @@ int main(int argc, char* argv[])
 #endif
 #ifdef SPHERE_SYSTEM
 	g_pSimulator= new SphereSystemSimulator();
+#endif
+#ifdef RIGID_BODY_SPRING_SYSTEM
+	g_pSimulator = new RigidBodySpringSystemSimulator();
 #endif
 	g_pSimulator->reset();
 

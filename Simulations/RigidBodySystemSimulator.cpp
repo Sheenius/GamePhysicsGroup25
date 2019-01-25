@@ -103,7 +103,7 @@ void RigidBodySystemSimulator::demo3() {
 }
 //Fix this collision
 void RigidBodySystemSimulator::demo4() {
-	addRigidBody(Vec3(-1, 0, 0), Vec3(0.5, 0.5, 0.5), 4);
+	addRigidBody(Vec3(1, 0, 0), Vec3(0.5, 0.5, 0.5), 4);
 	//addRigidBody(Vec3(1, 0, 0.1), Vec3(0.5, 0.5, 0.5), 3);
 	//addRigidBody(Vec3(0, 1, 0), Vec3(0.5, 0.5, 0.5), 4);
 	addRigidBody(Vec3(0, -1, 0), Vec3(100, 0.01, 100), 1000000);
@@ -161,38 +161,43 @@ void RigidBodySystemSimulator::collisionDetection() {
 			Rigidbody bodyA = rigidbodies[i];
 			Rigidbody bodyB = rigidbodies[j];
 			//Matrix for body A
-			matrix4x4<double> scaleMatrix;
-			scaleMatrix.initScaling(bodyA.size.x, bodyA.size.y, bodyA.size.z);
-			matrix4x4<double> rotationMatrix = bodyA.orientation.getRotMat();
-			matrix4x4<double> translationMatrix;
-			translationMatrix.initTranslation(bodyA.position.x, bodyA.position.y, bodyA.position.z);
-			matrix4x4<double> objToWorldMatrixA = scaleMatrix * rotationMatrix * translationMatrix;
+			matrix4x4<double> scaleMatrixA;
+			scaleMatrixA.initScaling(bodyA.size.x, bodyA.size.y, bodyA.size.z);
+			matrix4x4<double> rotationMatrixA = bodyA.orientation.getRotMat();
+			matrix4x4<double> translationMatrixA;
+			translationMatrixA.initTranslation(bodyA.position.x, bodyA.position.y, bodyA.position.z);
+			matrix4x4<double> objToWorldMatrixA = rotationMatrixA * translationMatrixA;
+			objToWorldMatrixA = scaleMatrixA * objToWorldMatrixA;
 			//Matrix for body B
-			scaleMatrix.initScaling(bodyB.size.x, bodyB.size.y, bodyB.size.z);
-			rotationMatrix = bodyB.orientation.getRotMat();
-			translationMatrix.initTranslation(bodyB.position.x, bodyB.position.y, bodyB.position.z);
-			matrix4x4<double> objToWorldMatrixB = scaleMatrix * rotationMatrix * translationMatrix;
+			matrix4x4<double> scaleMatrixB;
+			scaleMatrixB.initScaling(bodyB.size.x, bodyB.size.y, bodyB.size.z);
+			matrix4x4<double> rotationMatrixB = bodyB.orientation.getRotMat();
+			matrix4x4<double> translationMatrixB;
+			translationMatrixB.initTranslation(bodyB.position.x, bodyB.position.y, bodyB.position.z);
+			matrix4x4<double> objToWorldMatrixB = rotationMatrixB * translationMatrixB;
+			objToWorldMatrixB = scaleMatrixB * objToWorldMatrixB;
+
 			CollisionInfo collision = checkCollisionSAT(objToWorldMatrixA, objToWorldMatrixB);
 
 			//Check if collision has accured
 			if (!collision.isValid) {
-				break;
+				continue;
 			}
 
 			//Calculate inertia tensors and angular velocities
-			rotationMatrix = bodyA.orientation.getRotMat();
-			matrix4x4<double> rotationMatrixTransposed = bodyA.orientation.getRotMat();
-			rotationMatrixTransposed.transpose();
-			matrix4x4<double> inertiaTensorA = rotationMatrixTransposed * bodyA.inertiaTensor * rotationMatrix;
+			matrix4x4<double> rotationMatrixATransposed = bodyA.orientation.getRotMat();
+			rotationMatrixATransposed.transpose();
+			matrix4x4<double> inertiaTensorA = rotationMatrixA * bodyA.inertiaTensor * rotationMatrixATransposed;
 			Vec3 angularVelocityA = inertiaTensorA.transformVector(bodyA.angularMomentum);
 
-			rotationMatrix = bodyB.orientation.getRotMat();
-			rotationMatrixTransposed = bodyB.orientation.getRotMat();
-			rotationMatrixTransposed.transpose();
-			matrix4x4<double> inertiaTensorB = rotationMatrixTransposed * bodyB.inertiaTensor * rotationMatrix;
+			matrix4x4<double> rotationMatrixBTransposed = bodyB.orientation.getRotMat();
+			rotationMatrixBTransposed.transpose();
+			matrix4x4<double> inertiaTensorB = rotationMatrixB * bodyB.inertiaTensor * rotationMatrixBTransposed;
 			Vec3 angularVelocityB = inertiaTensorB.transformVector(bodyB.angularMomentum);
 
 			//Calculate relative velocity
+			collision.collisionPointWorld;
+
 			Vec3 collisionPointA = collision.collisionPointWorld - bodyA.position;
 			Vec3 collisionPointB = collision.collisionPointWorld - bodyB.position;
 			Vec3 velocityA = bodyA.linearVelocity + cross(angularVelocityA, collisionPointA);
@@ -200,12 +205,12 @@ void RigidBodySystemSimulator::collisionDetection() {
 			Vec3 relativeVelocity = velocityA - velocityB;
 			
 			//Check if bodies are seperating
-			if (dot(relativeVelocity, collision.normalWorld) > 0) {
-				break;
+			if (dot(relativeVelocity, collision.normalWorld) > 0.0) {
+				continue;
 			}
 
 			//Calculate impulse
-			double a = -(1 + BOUNCINESS) * dot(relativeVelocity, collision.normalWorld);
+			double a = -(1.0 + BOUNCINESS) * dot(relativeVelocity, collision.normalWorld);
 			double b = 1.0 / bodyA.mass + 1.0 / bodyB.mass;
 			Vec3 c = cross(inertiaTensorA.transformVector(cross(collisionPointA, collision.normalWorld)), collisionPointA);
 			Vec3 d = cross(inertiaTensorB.transformVector(cross(collisionPointB, collision.normalWorld)), collisionPointB);
@@ -246,6 +251,7 @@ void RigidBodySystemSimulator::simulateTimestep(float timestep)
 		rigidbodies[i].position += rigidbodies[i].linearVelocity * timestep;
 		//Integrate linear velocity
 		rigidbodies[i].linearVelocity += rigidbodies[i].force / rigidbodies[i].mass * timestep;
+		
 
 		//Integrate orientation
 		/*matrix4x4<double> rotationMatrix = it->orientation.getRotMat();
@@ -253,7 +259,7 @@ void RigidBodySystemSimulator::simulateTimestep(float timestep)
 		rotationMatrixTransposed.transpose();
 		matrix4x4<double> inertiaTensor = rotationMatrixTransposed * it->inertiaTensor * rotationMatrix;*/
 		Vec3 angularVelocity = getAngularVelocityOfRigidBody(i);
-		rigidbodies[i].orientation = rigidbodies[i].orientation + timestep / 2.0 * Quaternion<double>(angularVelocity.x, angularVelocity.y, angularVelocity.z, 0) * rigidbodies[i].orientation;
+		rigidbodies[i].orientation += timestep / 2.0 * Quaternion<double>(angularVelocity.x, angularVelocity.y, angularVelocity.z, 0) * rigidbodies[i].orientation;
 		//it->orientation /= it->orientation.norm();
 		rigidbodies[i].orientation = rigidbodies[i].orientation.unit();
 		//Integrate angular momentum
@@ -297,7 +303,7 @@ Vec3 RigidBodySystemSimulator::getAngularVelocityOfRigidBody(int i)
 	matrix4x4<double> rotationMatrix = rigidbodies[i].orientation.getRotMat();
 	matrix4x4<double> rotationMatrixTransposed = rotationMatrix;
 	rotationMatrixTransposed.transpose();
-	matrix4x4<double> inertiaTensor = rotationMatrixTransposed * rigidbodies[i].inertiaTensor * rotationMatrix;
+	matrix4x4<double> inertiaTensor = rotationMatrix * rigidbodies[i].inertiaTensor * rotationMatrixTransposed;
 	return inertiaTensor.transformVector(rigidbodies[i].angularMomentum);
 }
 
