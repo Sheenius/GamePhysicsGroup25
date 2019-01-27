@@ -13,7 +13,7 @@ RigidBodySpringSystemSimulator::~RigidBodySpringSystemSimulator()
 
 const char * RigidBodySpringSystemSimulator::getTestCasesStr()
 {
-	return "Demo";
+	return "Squidwart";
 }
 
 void RigidBodySpringSystemSimulator::initUI(DrawingUtilitiesClass * DUC)
@@ -85,24 +85,86 @@ void RigidBodySpringSystemSimulator::drawFrame(ID3D11DeviceContext * pd3dImmedia
 
 void RigidBodySpringSystemSimulator::notifyCaseChanged(int testCase)
 {
-	addMassPoint(Vec3(0.01, 0.01, 0.01), Vec3(0, 0, 0), 1, 0);
-	addRigidBody(Vec3(-0.01, -0.25, -0.01), Vec3(0.5, 0.5, 0.5), 1);
+	reset();
+	/*addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 0);
+	addRigidBody(Vec3(-3, -0.5, 0), Vec3(0.25, 0.25, 0.25), 0.1);
+	matrix4x4<double> rotationMatrix = matrix4x4<double>();
+	//rotationMatrix.initRotationY(-45);
+	rotationMatrix.initRotationXYZ(45, -45, 0);
+	Quaternion<double> rotationQuaternion = Quaternion<double>(rotationMatrix);
+	setOrientationOf(0, rotationQuaternion);
 
-	addMassPoint(Vec3(0, 0.6, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 0.7, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 0.8, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 0.9, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 1, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 1.1, 0), Vec3(0, 0, 0), 1, -1);
-	addMassPoint(Vec3(0, 1.2, 0), Vec3(0, 0, 0), 0, -1);
+	addMassPoint(Vec3(-2, 0.5, 0), Vec3(0, 0, 0), 1, -1);
+	addMassPoint(Vec3(-1, 1.5, 0), Vec3(0, 0, 0), 1, -1);
+	addMassPoint(Vec3(0, 2.5, 0), Vec3(0, 0, 0), 0, -1);
 
-	addSpring(0, 1, 0.15, 10);
-	addSpring(1, 2, 0.15, 10);
-	addSpring(2, 3, 0.15, 10);
-	addSpring(3, 4, 0.15, 10);
-	addSpring(4, 5, 0.15, 10);
-	addSpring(5, 6, 0.15, 10);
-	addSpring(6, 7, 0.15, 10);
+	float sqrt2 = sqrt(2);
+	addSpring(0, 1, sqrt2, 20);
+	addSpring(1, 2, sqrt2, 20);
+	addSpring(2, 3, sqrt2, 20);
+
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 1);
+	addRigidBody(Vec3(3, -0.5, 0), Vec3(0.25, 0.25, 0.25), 0.1);
+
+	addMassPoint(Vec3(2, 0.5, 0), Vec3(0, 0, 0), 1, -1);
+	addMassPoint(Vec3(1, 1.5, 0), Vec3(0, 0, 0), 1, -1);
+
+	addSpring(4, 5, sqrt2, 20);
+	addSpring(5, 6, sqrt2, 20);
+	addSpring(6, 3, sqrt2, 20);
+
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 2);
+	addRigidBody(Vec3(0, -0.5, 3), Vec3(0.25, 0.25, 0.25), 0.1);
+
+	addMassPoint(Vec3(0, 0.5, 2), Vec3(0, 0, 0), 1, -1);
+	addMassPoint(Vec3(0, 1.5, 1), Vec3(0, 0, 0), 1, -1);
+
+	addSpring(7, 8, sqrt2, 20);
+	addSpring(8, 9, sqrt2, 20);
+	addSpring(9, 3, sqrt2, 20);
+
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 3);
+	addRigidBody(Vec3(0, -0.5, -3), Vec3(0.25, 0.25, 0.25), 0.1);
+
+	addMassPoint(Vec3(0, 0.5, -2), Vec3(0, 0, 0), 1, -1);
+	addMassPoint(Vec3(0, 1.5, -1), Vec3(0, 0, 0), 1, -1);
+
+	addSpring(10, 11, sqrt2, 20);
+	addSpring(11, 12, sqrt2, 20);
+	addSpring(12, 3, sqrt2, 20);*/
+
+	float rigidBodyMass = 0.05;
+
+	addMassPoint(Vec3(0, 7.5, 0), Vec3(0, 0, 0), 0, -1);
+
+	addRigidBody(Vec3(-5, 7.5, 0), Vec3(0.25, 0.25, 0.25), rigidBodyMass);
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 0);
+
+	addRigidBody(Vec3(5, 7.5, 0), Vec3(0.25, 0.25, 0.25), rigidBodyMass);
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 1);
+
+	addRigidBody(Vec3(0, 10.5, -4), Vec3(0.25, 0.25, 0.25), rigidBodyMass);
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 2);
+
+	addRigidBody(Vec3(0, 10.5, 4), Vec3(0.25, 0.25, 0.25), rigidBodyMass);
+	addMassPoint(Vec3(0.0001, 0.0001, 0.0001), Vec3(0, 0, 0), 1, 3);
+
+	float stiffness = 200;
+
+	for (int i = 0; i < 4; i++) {
+		Vec3 increment = (masspoints[0].position - rigidbodies[i].position) / 12;
+		Vec3 position = rigidbodies[i].position + increment;
+		addSpring(i + 1, masspoints.size(), norm(increment), stiffness);
+		for (int j = 0; j < 11; j++) {
+			addMassPoint(position, Vec3(0, 0, 0), 1, -1);
+			if (j < 10) {
+				addSpring(masspoints.size() - 1, masspoints.size(), norm(increment), stiffness);
+			}
+			position += increment;
+		}
+		addSpring(masspoints.size() - 1, 0, norm(increment), stiffness);
+	}
+
 }
 
 void RigidBodySpringSystemSimulator::externalForcesCalculations(float timeElapsed)
@@ -117,7 +179,7 @@ void RigidBodySpringSystemSimulator::simulateTimestep(float timestep)
 		if (it->massInverse > 0) {
 			gravitation = gravity / it->massInverse;
 		}
-		it->force = gravitation;// + damping * it->velocity;
+		it->force = gravitation - damping * it->velocity;
 	}
 	for (vector<Spring>::iterator it = springs.begin(); it != springs.end(); ++it) {
 		Spring spring = *it;
@@ -166,6 +228,9 @@ void RigidBodySpringSystemSimulator::simulateTimestep(float timestep)
 	}
 	forces.clear();
 	for (int i = 0; i < rigidbodies.size(); i++) {
+		//Damping
+		rigidbodies[i].torque -= rigidbodies[i].angularMomentum * damping;
+		rigidbodies[i].force -= rigidbodies[i].linearVelocity * damping;
 		//Integrate linear velocity
 		rigidbodies[i].linearVelocity += rigidbodies[i].force * rigidbodies[i].massInverse * timestep;
 		//Integrate position
@@ -237,6 +302,12 @@ matrix4x4<double> RigidBodySpringSystemSimulator::calculateInertiaTensor(double 
 		0.0f, 0.0f, 12.0f * massInverse / (xSquared + ySquared), 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f
 	);
+}
+
+void RigidBodySpringSystemSimulator::setOrientationOf(int i, Quat orientation)
+{
+	orientation = orientation.unit();
+	rigidbodies[i].orientation = orientation;
 }
 
 Vec3 RigidBodySpringSystemSimulator::getAngularVelocityOfRigidBody(int i)

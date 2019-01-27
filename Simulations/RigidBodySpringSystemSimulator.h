@@ -28,8 +28,9 @@ private:
 	const Vec3 MASSPOINT_COLOR = Vec3(1, 0, 0);
 	const Vec3 SPRING_COLOR = Vec3(0, 1, 0);
 
-	Vec3 gravity = Vec3(0, -0.5, 0);
-	double damping = 0.7;
+	Vec3 gravity = Vec3(0, -1, 0);
+	double damping = 0.1;
+	const double BOUNCINESS = 1;
 
 	struct Rigidbody {
 		Vec3 position;
@@ -69,9 +70,8 @@ private:
 	};
 	vector<Force> forces;
 
-	const double BOUNCINESS = 0.7;
-
 	matrix4x4<double> calculateInertiaTensor(double massInverse, Vec3 size);
+	void setOrientationOf(int i, Quat orientation);
 	Vec3 getAngularVelocityOfRigidBody(int i);
 	void collisionDetection();
 
